@@ -3,7 +3,7 @@ import random
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
-def random_sleep(min_sec=5, max_sec=15):
+def random_sleep(min_sec=300, max_sec=1200):
     sleep_time = random.randint(min_sec, max_sec)
     print(f"Sleeping for {sleep_time} seconds (coffee break!)")
     time.sleep(sleep_time)
