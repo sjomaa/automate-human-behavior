@@ -1,5 +1,6 @@
 import time
 import random
+import os
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
@@ -16,22 +17,46 @@ def selenium_sleep(min_sec=2, max_sec=5):
 # Set up the WebDriver (make sure chromedriver is in your PATH)
 driver = webdriver.Chrome()
 
+# Get credentials from environment variables or use defaults
+test_username = os.environ.get("LINKEDIN_USERNAME", "test")
+test_password = os.environ.get("LINKEDIN_PASSWORD", "test")
+
 try:
     # 1. Open LinkedIn and log in to a test account
     driver.get("https://www.linkedin.com/login")
     selenium_sleep(5, 10)
     # Enter username
     username_field = driver.find_element("id", "username")
-    username_field.send_keys("test")  # Replace with your test username
+    username_field.send_keys(test_username)  # Uses env or default
     # Enter password
     password_field = driver.find_element("id", "password")
-    password_field.send_keys("test")  # Replace with your test password
+    password_field.send_keys(test_password)  # Uses env or default
     # Submit login form
     password_field.send_keys(Keys.RETURN)
     selenium_sleep(5, 10)
     # Simulate scrolling after login
     for _ in range(3):
         driver.find_element("tag name", "body").send_keys(Keys.PAGE_DOWN)
+        selenium_sleep(2, 5)
+
+    # Simulate random actions after login
+    actions = [
+        lambda: driver.find_element("tag name", "body").send_keys(Keys.PAGE_DOWN),
+        lambda: driver.find_element("tag name", "body").send_keys(Keys.PAGE_UP),
+        lambda: driver.back(),
+        lambda: driver.forward(),
+        lambda: driver.refresh(),
+        # Example: click on the 'My Network' tab if present
+        lambda: driver.find_element("xpath", "//a[contains(@href, '/mynetwork')]").click() if driver.find_elements("xpath", "//a[contains(@href, '/mynetwork')]") else None,
+        # Example: click on the 'Jobs' tab if present
+        lambda: driver.find_element("xpath", "//a[contains(@href, '/jobs')]").click() if driver.find_elements("xpath", "//a[contains(@href, '/jobs')]") else None,
+    ]
+    for _ in range(100):
+        action = random.choice(actions)
+        try:
+            action()
+        except Exception as e:
+            print(f"Action failed: {e}")
         selenium_sleep(2, 5)
 
     coffee_break()
